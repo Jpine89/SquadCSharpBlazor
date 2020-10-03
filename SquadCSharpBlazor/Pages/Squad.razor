@@ -1,6 +1,6 @@
 ﻿@page "/Squad"
 @inject PlayerListModel PlayerlistModel
-@inject IConfiguration squadconfig
+@*@inject IConfiguration squadconfig*@
 <h3>Squad</h3>
 
 @*<EditForm Model="@newTask" OnValidSubmit="AddTask">
@@ -15,11 +15,9 @@
 </ul>
 
 @code {
-        //private List<PlayerListModel> playerList = new List<PlayerListModel>();
-        //private PlayerListModel newTask = new PlayerListModel();
-
     protected override void OnInitialized()
     {
+        //Var test = squadconfig("IP");
         PlayerlistModel.OnChange += StateHasChanged;
         PlayerlistModel.loadRconAsync();
     }

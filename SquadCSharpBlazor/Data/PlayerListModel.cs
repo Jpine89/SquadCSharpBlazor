@@ -36,6 +36,7 @@ namespace SquadCSharpBlazor.Data
         {
             var rcon = new RCON(IPAddress.Parse(Configuration["IP"]), Convert.ToUInt16(Configuration["Port"]), Configuration["Pass"], 10000, true);
             await rcon.ConnectAsync();
+            
             string response = await rcon.SendCommandAsync("ListPlayers");
             string[] playListString = response.Split("\n");
             foreach (string value in playListString)
