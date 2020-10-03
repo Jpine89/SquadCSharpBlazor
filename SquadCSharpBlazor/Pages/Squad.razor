@@ -15,31 +15,13 @@
 </ul>
 
 @code {
-    private readonly IConfiguration Configuration;
-    //private List<PlayerListModel> playerList = new List<PlayerListModel>();
-    //private PlayerListModel newTask = new PlayerListModel();
+        //private List<PlayerListModel> playerList = new List<PlayerListModel>();
+        //private PlayerListModel newTask = new PlayerListModel();
 
     protected override void OnInitialized()
     {
         PlayerlistModel.OnChange += StateHasChanged;
-        AddTask();
-    }
-
-    private async void AddTask()
-    {
-
-        var rcon = new RCON(IPAddress.Parse(squadconfig["IP"]), Convert.ToUInt16(squadconfig["Port"]), squadconfig["Pass"], 10000, true);
-        await rcon.ConnectAsync();
-        string response = await rcon.SendCommandAsync("ListPlayers");
-
-        string[] playListString = response.Split("\n");
-        foreach (string value in playListString)
-        {
-            PlayerlistModel.Add(value);
-            await InvokeAsync(() => StateHasChanged());
-        }
-
-
+        PlayerlistModel.loadRconAsync();
     }
 
     public void Dispose()
