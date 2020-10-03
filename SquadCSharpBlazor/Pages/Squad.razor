@@ -1,0 +1,49 @@
+﻿@page "/Squad"
+@inject PlayerListModel PlayerlistModel
+<h3>Squad</h3>
+
+@*<EditForm Model="@newTask" OnValidSubmit="AddTask">
+        <button type="submit">Add Task</button>
+    </EditForm>*@
+
+<ul>
+    @foreach (var player in PlayerlistModel.playerList)
+    {
+        <li>@player</li>
+    }
+</ul>
+
+@code {
+
+    //private List<PlayerListModel> playerList = new List<PlayerListModel>();
+    //private PlayerListModel newTask = new PlayerListModel();
+
+    protected override void OnInitialized()
+    {
+        PlayerlistModel.OnChange += StateHasChanged;
+        AddTask();
+    }
+
+    private async void AddTask()
+    {
+        var rcon = new RCON(IPAddress.Parse(ConfigurationManager.AppSettings.Get("20r_IP")), Convert.ToUInt16(ConfigurationManager.AppSettings.Get("20r_Port")), ConfigurationManager.AppSettings.Get("20r_Pass"), 10000, true);
+        await rcon.ConnectAsync();
+        string response = await rcon.SendCommandAsync("ListPlayers");
+
+        string[] playListString = response.Split("\n");
+        foreach (string value in playListString)
+        {
+            PlayerlistModel.Add(value);
+            await InvokeAsync(() => StateHasChanged());
+        }
+
+
+    }
+
+    public void Dispose()
+    {
+        PlayerlistModel.OnChange -= StateHasChanged;
+    }
+
+
+}
