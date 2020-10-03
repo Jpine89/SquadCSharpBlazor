@@ -1,5 +1,6 @@
 ﻿@page "/Squad"
 @inject PlayerListModel PlayerlistModel
+@inject IConfiguration squadconfig
 <h3>Squad</h3>
 
 @*<EditForm Model="@newTask" OnValidSubmit="AddTask">
@@ -14,7 +15,7 @@
 </ul>
 
 @code {
-
+    private readonly IConfiguration Configuration;
     //private List<PlayerListModel> playerList = new List<PlayerListModel>();
     //private PlayerListModel newTask = new PlayerListModel();
 
@@ -26,7 +27,8 @@
 
     private async void AddTask()
     {
-        var rcon = new RCON(IPAddress.Parse(ConfigurationManager.AppSettings.Get("20r_IP")), Convert.ToUInt16(ConfigurationManager.AppSettings.Get("20r_Port")), ConfigurationManager.AppSettings.Get("20r_Pass"), 10000, true);
+
+        var rcon = new RCON(IPAddress.Parse(squadconfig["IP"]), Convert.ToUInt16(squadconfig["Port"]), squadconfig["Pass"], 10000, true);
         await rcon.ConnectAsync();
         string response = await rcon.SendCommandAsync("ListPlayers");
 
