@@ -9,7 +9,7 @@ namespace SquadCSharpBlazor.Patterns
     {
         public PlayerWounded()
         {
-            _PatternType = "ChatMessage";
+            _PatternType = "playerWounded";
             _Pattern = "\\[(ChatAll|ChatTeam|ChatSquad|ChatAdmin)] \\[SteamID:([0-9]{17})] (.+?) : (.*)";
             _StoredLists = new List<string>();
 

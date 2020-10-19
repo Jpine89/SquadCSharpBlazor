@@ -34,6 +34,7 @@ namespace SquadCSharpBlazor.Patterns
             playerDied = new PlayerDied();
             playerPosses = new PlayerPosses();
             playerUnPosses = new PlayerUnPosses();
+            playerRevived = new PlayerRevived();
             playerWounded = new PlayerWounded();
             roundWinner = new RoundWinner();
             serverTick = new ServerTickRate();
@@ -51,6 +52,7 @@ namespace SquadCSharpBlazor.Patterns
             _RegexParseList.Add(playerDied._PatternType, playerDied._Pattern);
             _RegexParseList.Add(playerPosses._PatternType, playerPosses._Pattern);
             _RegexParseList.Add(playerUnPosses._PatternType, playerUnPosses._Pattern);
+            _RegexParseList.Add(playerRevived._PatternType, playerRevived._Pattern);
             _RegexParseList.Add(playerWounded._PatternType, playerWounded._Pattern);
             _RegexParseList.Add(roundWinner._PatternType, roundWinner._Pattern);
             _RegexParseList.Add(serverTick._PatternType, serverTick._Pattern);
@@ -61,9 +63,57 @@ namespace SquadCSharpBlazor.Patterns
         {
             switch (key)
             {
-                case "ChatMessage":
+                case "chatMessage":
                     //Console.WriteLine("Test");
                     chatMessage.Add(line, substring);
+                    break;
+                case "adminBroadcast":
+                    //Console.WriteLine("Test");
+                    adminBroadcast.Add(line, substring);
+                    break;
+                case "newGame":
+                    //Console.WriteLine("Test");
+                    newGame.Add(line, substring);
+                    break;
+                case "playerConnected":
+                    //Console.WriteLine("Test");
+                    playerConnected.Add(line, substring);
+                    break;
+                case "playerDamaged":
+                    //Console.WriteLine("Test");
+                    playerDamaged.Add(line, substring);
+                    break;
+                case "playerDied":
+                    //Console.WriteLine("Test");
+                    playerDied.Add(line, substring);
+                    break;
+                case "playerPosses":
+                    //Console.WriteLine("Test");
+                    playerPosses.Add(line, substring);
+                    break;
+                case "playerUnPosses":
+                    //Console.WriteLine("Test");
+                    playerUnPosses.Add(line, substring);
+                    break;
+                case "playerRevived":
+                    //Console.WriteLine("Test");
+                    playerRevived.Add(line, substring);
+                    break;
+                case "playerWounded":
+                    //Console.WriteLine("Test");
+                    playerWounded.Add(line, substring);
+                    break;
+                case "roundWinner":
+                    //Console.WriteLine("Test");
+                    roundWinner.Add(line, substring);
+                    break;
+                case "serverTick":
+                    //Console.WriteLine("Test");
+                    serverTick.Add(line, substring);
+                    break;
+                case "steamID":
+                    //Console.WriteLine("Test");
+                    steamID.Add(line, substring);
                     break;
                 default:
                     Console.WriteLine("Default was Called");
