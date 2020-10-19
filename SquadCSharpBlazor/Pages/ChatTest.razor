@@ -1,0 +1,86 @@
+﻿@page "/ChatTest"
+@inject ChatModel ChatModel
+@implements IDisposable
+<h3>chatTest</h3>
+
+
+<div class="container-fluid">
+    <ul>
+        @foreach (var chat in ChatModel._Chat)
+        {
+            <li class="list-group-item text-left">@chat</li>
+        }
+    </ul>
+</div>
+
+@functions {
+    private System.Timers.Timer _timer;
+    private long lastMaxOffset;
+
+    protected override async Task OnInitializedAsync()
+    {
+        ChatModel.OnChange += StateHasChanged;
+        int currentCount = 0;
+        Console.WriteLine("Test");
+        //await InvokeAsync(
+        //ChatModel.StartReadFile
+        //);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+
+
+        if (firstRender)
+        {
+            _timer = new System.Timers.Timer(2000);
+
+            _timer.Elapsed += async (s, e) =>
+            {
+
+                //Console.WriteLine("Test");
+                //start at the end of the file
+
+                if (ChatModel.firstTime) {
+                    lastMaxOffset = ChatModel.reader.BaseStream.Length;
+                    ChatModel.firstTime = false;
+                }
+
+                //if the file size has not changed, idle
+                if (ChatModel.reader.BaseStream.Length == lastMaxOffset)
+                    Console.WriteLine("File Size currently: " + ChatModel.reader.BaseStream.Length, " , saved filed size: " + lastMaxOffset);
+                else
+                {
+                    //seek to the last max offset
+                    //ChatModel.reader.BaseStream.Seek(lastMaxOffset, SeekOrigin.Begin);
+
+                    //read out of the file until the EOF
+                    string line = "";
+                    //line = reader.ReadLine();
+                    while ((line = ChatModel.reader.ReadLine()) != null)
+                    {
+                        if(!string.IsNullOrWhiteSpace(line))
+                            ChatModel.Add(line);
+                    }
+
+
+                    await InvokeAsync(StateHasChanged);
+                    //update the last max offset
+                    lastMaxOffset = ChatModel.reader.BaseStream.Position;
+                }
+
+
+            };
+            _timer.Enabled = true;
+
+
+        }
+    }
+
+    public void Dispose()
+    {
+        _timer.Enabled = false;
+        ChatModel.OnChange -= StateHasChanged;
+        ChatModel.PageActive = false;
+    }
+}

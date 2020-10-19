@@ -1,5 +1,7 @@
 ﻿@page "/Squad"
 @inject PlayerListModel PlayerlistModel
+@inject ChatModel ChatModel 
+@*@inject ChatModel ChatModel*@ 
 @*@inject IConfiguration squadconfig*@
 <h3>Squad</h3>
 
@@ -7,12 +9,42 @@
         <button type="submit">Add Task</button>
     </EditForm>*@
 
-<ul>
-    @foreach (var player in PlayerlistModel.playerList)
-    {
-        <li>@player</li>
-    }
-</ul>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col">
+            1 of 2
+        </div>
+        <div class="col">
+            2 of 2
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <ul class="overflow-auto" style="height: 100vh">
+                <li class="list-group-item active">Cras justo odio</li>
+
+                @foreach (var player in PlayerlistModel._playerList)
+                {
+                    <li class="list-group-item text-left">@player</li>
+                }
+            </ul>
+        </div>
+        <div class="col">
+            <div class="container-fluid">
+                <ul class="overflow-auto" style="height: 100vh">
+                    <li class="list-group-item active">Cras justo odio</li>
+
+                    @foreach (var chat in ChatModel._Chat)
+                    {
+                        <li class="list-group-item text-left">@chat</li>
+                    }
+                </ul>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
 
 @code {
     protected override void OnInitialized()
