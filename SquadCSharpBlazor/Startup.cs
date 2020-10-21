@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 using SquadCSharpBlazor.Data;
+using SquadCSharpBlazor.Patterns;
 
 namespace SquadCSharpBlazor
 {
@@ -32,6 +33,7 @@ namespace SquadCSharpBlazor
             services.AddSingleton<WeatherForecastService>();
             services.AddScoped<PlayerListModel>();
             services.AddSingleton<ChatModel>();
+            services.AddSingleton<AllPatterns>();
             //services.AddScoped<ChatModel>();
         }
 

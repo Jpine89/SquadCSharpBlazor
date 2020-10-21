@@ -1,12 +1,13 @@
 ﻿@page "/ChatTest"
 @inject ChatModel ChatModel
+@inject AllPatterns AllPatterns
 @implements IDisposable
 <h3>chatTest</h3>
 
 
 <div class="container-fluid">
     <ul>
-        @foreach (var chat in ChatModel._Chat)
+        @foreach (var chat in AllPatterns._ChatMessage)
         {
             <li class="list-group-item text-left">@chat</li>
         }
@@ -29,52 +30,63 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-
-
         if (firstRender)
         {
             _timer = new System.Timers.Timer(2000);
 
             _timer.Elapsed += async (s, e) =>
             {
-
-                //Console.WriteLine("Test");
-                //start at the end of the file
-
-                if (ChatModel.firstTime) {
-                    lastMaxOffset = ChatModel.reader.BaseStream.Length;
-                    ChatModel.firstTime = false;
-                }
-
-                //if the file size has not changed, idle
-                if (ChatModel.reader.BaseStream.Length == lastMaxOffset)
-                    Console.WriteLine("File Size currently: " + ChatModel.reader.BaseStream.Length, " , saved filed size: " + lastMaxOffset);
-                else
-                {
-                    //seek to the last max offset
-                    //ChatModel.reader.BaseStream.Seek(lastMaxOffset, SeekOrigin.Begin);
-
-                    //read out of the file until the EOF
-                    string line = "";
-                    //line = reader.ReadLine();
-                    while ((line = ChatModel.reader.ReadLine()) != null)
-                    {
-                        if(!string.IsNullOrWhiteSpace(line))
-                            ChatModel.Add(line);
-                    }
-
-
-                    await InvokeAsync(StateHasChanged);
-                    //update the last max offset
-                    lastMaxOffset = ChatModel.reader.BaseStream.Position;
-                }
-
-
+                await ChatModel.StartReadFile(AllPatterns);
+                await InvokeAsync(StateHasChanged);
             };
             _timer.Enabled = true;
-
-
         }
+
+        //if (firstRender)
+        //{
+        //    _timer = new System.Timers.Timer(2000);
+
+        //    _timer.Elapsed += async (s, e) =>
+        //    {
+
+        //    //Console.WriteLine("Test");
+        //    //start at the end of the file
+
+        //    if (ChatModel.firstTime)
+        //        {
+        //            lastMaxOffset = ChatModel.reader.BaseStream.Length;
+        //            ChatModel.firstTime = false;
+        //        }
+
+        //    //if the file size has not changed, idle
+        //    if (ChatModel.reader.BaseStream.Length == lastMaxOffset)
+        //            Console.WriteLine("File Size currently: " + ChatModel.reader.BaseStream.Length, " , saved filed size: " + lastMaxOffset);
+        //        else
+        //        {
+        //        //seek to the last max offset
+        //        //ChatModel.reader.BaseStream.Seek(lastMaxOffset, SeekOrigin.Begin);
+
+        //        //read out of the file until the EOF
+        //        string line = "";
+        //        //line = reader.ReadLine();
+        //        while ((line = ChatModel.reader.ReadLine()) != null)
+        //            {
+        //                if (!string.IsNullOrWhiteSpace(line))
+        //                    ChatModel.Add(line);
+        //            }
+
+
+        //            await InvokeAsync(StateHasChanged);
+        //        //update the last max offset
+        //        lastMaxOffset = ChatModel.reader.BaseStream.Position;
+        //        }
+
+
+        //    };
+        //    _timer.Enabled = true;
+
+
+        //}
     }
 
     public void Dispose()

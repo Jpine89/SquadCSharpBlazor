@@ -1,6 +1,7 @@
 ﻿@page "/Squad"
 @inject PlayerListModel PlayerlistModel
 @inject ChatModel ChatModel 
+@inject AllPatterns AllPatterns 
 @*@inject ChatModel ChatModel*@ 
 @*@inject IConfiguration squadconfig*@
 <h3>Squad</h3>
@@ -34,7 +35,7 @@
                 <ul class="overflow-auto" style="height: 100vh">
                     <li class="list-group-item active">Cras justo odio</li>
 
-                    @foreach (var chat in ChatModel._Chat)
+                    @foreach (var chat in AllPatterns._ChatMessage)
                     {
                         <li class="list-group-item text-left">@chat</li>
                     }
@@ -47,11 +48,29 @@
 
 
 @code {
+    private System.Timers.Timer _timer;
+
     protected override void OnInitialized()
     {
         //Var test = squadconfig("IP");
         PlayerlistModel.OnChange += StateHasChanged;
         PlayerlistModel.loadRconAsync();
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _timer = new System.Timers.Timer(2000);
+
+            _timer.Elapsed += async (s, e) =>
+            {
+                await ChatModel.StartReadFile(AllPatterns);
+                await InvokeAsync(StateHasChanged);
+            };
+            _timer.Enabled = true;
+        }
     }
 
     public void Dispose()
