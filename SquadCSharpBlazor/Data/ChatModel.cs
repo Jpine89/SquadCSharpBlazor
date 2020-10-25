@@ -21,6 +21,7 @@ namespace SquadCSharpBlazor.Data
         private long lastMaxOffset;
         private string lineReturn;
         private int debugCounter;
+        private Boolean userJoining;
         //public AllPatterns regexPattern;
         public ChatModel()
         {
@@ -31,6 +32,7 @@ namespace SquadCSharpBlazor.Data
             reader = new StreamReader(new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite));
             lineReturn = "";
             debugCounter = 0;
+            userJoining = false;
             //regexPattern = new AllPatterns();
         }
 
@@ -66,9 +68,7 @@ namespace SquadCSharpBlazor.Data
                     //ChatModel.reader.BaseStream.Seek(lastMaxOffset, SeekOrigin.Begin);
 
                     //read out of the file until the EOF
-                    string line = "";
-                    int counter = 0;
-                    
+                    string line = "";                    
                     //line = reader.ReadLine();
                     while ((line = reader.ReadLine()) != null)
                     {
@@ -76,29 +76,40 @@ namespace SquadCSharpBlazor.Data
                         if (string.IsNullOrWhiteSpace(line) | Regex.IsMatch(line, "SendOutboundMessage")) { continue; }
                         else
                         {
-                            foreach (var pattern in allPatterns._stringPatterns)
+
+
+                            foreach (var pattern in allPatterns._AllPatterns)
                             {
-                                rg = new Regex(pattern);
+                                rg = new Regex(pattern.Value);
                                 Match match = rg.Match(line);
                                 if (match.Success)
                                 {
-                                    if (!lineReturn.Equals(match.Value))
+                                    if(userJoining & Regex.IsMatch(match.Value, "LogEasyAntiCheatServer"))
                                     {
-                                        //Console.WriteLine(match.Value);
-                                        subStrings = Regex.Split(line, pattern);
-                                        foreach(var test in subStrings)
-                                            Console.WriteLine(test);
-                                        allPatterns.matchList(allPatterns._stringTypes[counter], match.Value, subStrings);
+                                        subStrings = Regex.Split(line, pattern.Value);
+                                        allPatterns.matchList("userJoining", match.Value, subStrings, userJoining);
                                         lineReturn = match.Value;
+                                        userJoining = false;
+                                        break;
                                     }
-                                    //Console.WriteLine(match.Value);
-
-                                    //
-
+                                    else if(Regex.IsMatch(match.Value, "NewPlayer: BP_PlayerController_C"))
+                                    {
+                                        subStrings = Regex.Split(line, pattern.Value);
+                                        allPatterns.matchList("userJoining", match.Value, subStrings);
+                                        lineReturn = match.Value;
+                                        userJoining = true;
+                                        break;
+                                    }
+                                    else if (!lineReturn.Equals(match.Value))
+                                    {
+                                        subStrings = Regex.Split(line, pattern.Value);
+                                        allPatterns.matchList(pattern.Key, match.Value, subStrings);
+                                        lineReturn = match.Value;
+                                        userJoining = false;
+                                        break;
+                                    }
                                 }
-                                counter++;
                             }
-                            counter = 0;
                         }
                     }
 
@@ -108,7 +119,7 @@ namespace SquadCSharpBlazor.Data
             }
             catch(ArgumentException e) 
             {
-                Console.WriteLine("ArgumentException Caught");
+                Console.WriteLine("ArgumentException Caught: " + e);
                 Console.WriteLine(debugCounter);
             }
             

@@ -7,137 +7,160 @@ namespace SquadCSharpBlazor.Patterns
 {
     public class AllPatterns
     {
-
-        public string[] _stringPatterns =
-        {
-            "\\[([0-9.:-]+)]\\[([ 0-9]*)]LogSquad: ADMIN COMMAND: Message broadcasted <(.+)> from (.+)",
-            "\\[([0-9.:-]+)]\\[([ 0-9]*)]LogWorld: Bringing World \\/([A-z]+)\\/Maps\\/([A-z]+)\\/(?:Gameplay_Layers\\/)?([A-z0-9_]+)",
-            "\\[([0-9.:-]+)]\\[([ 0-9]*)]LogNet: Join succeeded: (.+)",
-            "\\[([0-9.:-]+)]\\[([ 0-9]*)]LogSquad: Player:(.+) ActualDamage=([0-9.]+) from (.+) caused by ([A-z_0-9]+)_C",
-            "\\[([0-9.:-]+)]\\[([ 0-9]*)]LogSquadTrace: \\[DedicatedServer](?:ASQSoldier::)?Die\\(\\): Player:(.+) KillingDamage=(?:-)*([0-9.]+) from ([A-z_0-9]+) caused by ([A-z_0-9]+)_C",
-            "\\[([0-9.:-]+)]\\[([ 0-9]*)]LogSquadTrace: \\[DedicatedServer](?:ASQPlayerController::)?OnPossess\\(\\): PC=(.+) Pawn=([A-z0-9_]+)_C",
-            "\\[([0-9.:-]+)]\\[([ 0-9]*)]LogSquadTrace: \\[DedicatedServer](?:ASQPlayerController::)?OnUnPossess\\(\\): PC=(.+)",
-            "\\[([0-9.:-]+)]\\[([ 0-9]*)]LogSquad: (.+) has revived (.+)\\.",
-            "\\[([0-9.:-]+)]\\[([ 0-9]*)]LogSquadTrace: \\[DedicatedServer](?:ASQSoldier::)?Wound\\(\\): Player:(.+) KillingDamage=(?:-)*([0-9.]+) from ([A-z_0-9]+) caused by ([A-z_0-9]+)_C",
-            "\\[([0-9.:-]+)]\\[([ 0-9]*)]LogSquadTrace: \\[DedicatedServer]ASQGameMode::DetermineMatchWinner\\(\\): (.+) won on (.+)",
-            "\\[([0-9.:-]+)]\\[([ 0-9]*)]LogSquad: USQGameState: Server Tick Rate: ([0-9.]+)",
-            "\\[([0-9.:-]+)]\\[([ 0-9]*)]LogEasyAntiCheatServer: \\[[0-9:]+]\\[[A-z]+]\\[EAC Server] \\[Info]\\[RegisterClient] Client: ([A-z0-9]+) PlayerGUID: ([0-9]{17}) PlayerIP: [0-9]{17} OwnerGUID: [0-9]{17} PlayerName: (.+)",
-            "\\[(ChatAll|ChatTeam|ChatSquad|ChatAdmin)] \\[SteamID:([0-9]{17})] (.+?) : (.*)",
-            "/ID: ([0-9]+) \\| SteamID: ([0-9]{17}) \\| Name: (.+) \\| Team ID: ([0-9]+) \\| Squad ID: ([0-9]+|N\\/A)",
-            "/^Current map is (.+), Next map is (.*)/"
-        };
-        public string[] _stringTypes =
-        {
-            "adminBroadcast",
-            "newGame",
-            "playerConnected",
-            "playerDamaged",
-            "playerDied",
-            "playerPosses",
-            "playerUnPosses",
-            "playerRevived",
-            "playerWounded",
-            "roundWinner",
-            "serverTick",
-            "steamID",
-            "chatMessage",
-            "playerList",
-            "currentMap"
-        };
-        public Dictionary<string, string> _RegexParseList;
+        /*
+         * _ChatMessage
+         * Will store all Chat Logs for local use.
+         * Permanent local storage, but all Chatlogs will also be sent to DB
+         * ----Items stored in local ChatMessage----
+         * ChatAll/ChatTeam/ChatAdmin
+         * Player Joins/Disconnect
+         * TeamKills
+         * BroadCasts
+         */
         public List<string> _ChatMessage { get; set; }
+        
         public List<string> _AdminBroadcast { get; set; }
+        //Temporary till Database is Setup
         public List<string> _NewGame { get; set; }
+        //Temporary till Database is Setup
         public List<string> _PlayerKilled { get; set; }
+        //Temporary till Database is Setup
         public List<string> _PlayerWounded { get; set; }
+        //Temporary till Database is Setup
         public List<string> _PlayerPosses { get; set; }
+        //Temporary till Database is Setup
         public List<string> _PlayerUnPosses { get; set; }
+        //Temporary till Database is Setup
         public List<string> _PlayerRevived { get; set; }
+        //Temporary till Database is Setup
         public List<string> _RoundWinner { get; set; }
+        //Temporary till Database is Setup
         public List<string> _SteamID { get; set; }
+        //Temporary till Database is Setup
         public List<string> _ServerTic { get; set; }
-
+        //Temporary till Database is Setup
         public List<string> _PlayerConnected { get; set; }
+
+        public Dictionary<string, string> _AllPatterns;
+        public Dictionary<string, string> setUserNameToC_ID;
+        private Dictionary<string, string> userSteamToC_ID;
+        public Dictionary<string, string> userSetToTeam;
+        public List<string> adminInCameraList;
+        public Dictionary<string, string> adminInCameraDic;
+        private string C_ID;
 
         public AllPatterns()
         {
-            _ChatMessage = new List<string>();
-            _PlayerConnected = new List<string>();
-            _NewGame = new List<string>();
-            _AdminBroadcast = new List<string>();
-            _PlayerKilled = new List<string>();
-            _PlayerWounded = new List<string>();
-            _PlayerPosses = new List<string>();
-            _PlayerUnPosses = new List<string>();
-            _PlayerRevived = new List<string>();
-            _RoundWinner = new List<string>();
-            _SteamID = new List<string>();
-            _ServerTic = new List<string>();
+            C_ID = "";
+            adminInCameraList = new List<string>();
+            adminInCameraDic = new Dictionary<string, string>();
+            userSetToTeam = new Dictionary<string, string>();
+            setUserNameToC_ID = new Dictionary<string, string>();
+            userSteamToC_ID = new Dictionary<string, string>();
+            _AllPatterns = new Dictionary<string, string>();
+            patternSetup();
         }
 
+        private void patternSetup()
+        {
+            _AllPatterns.Add("playerConnected", "\\[([0-9.:-]+)]\\[[ 0-9]*]LogSquad: PostLogin: NewPlayer: BP_PlayerController_C \\/Game\\/Maps\\/[A-z]+\\/(?:Gameplay_Layers\\/)?[A-z0-9_]+.[A-z0-9_]+:PersistentLevel.BP_PlayerController_(C_[0-9]+)");
+            _AllPatterns.Add("steamID", "\\[([0-9.:-]+)]\\[([ 0-9]*)]LogEasyAntiCheatServer: \\[[0-9:]+]\\[[A-z]+]\\[EAC Server] \\[Info]\\[RegisterClient] Client: ([A-z0-9]+) PlayerGUID: ([0-9]{17}) PlayerIP: [0-9]{17} OwnerGUID: [0-9]{17} PlayerName: (.+)");
+            _AllPatterns.Add("chatMessage", "\\[(ChatAll|ChatTeam|ChatSquad|ChatAdmin)] \\[SteamID:([0-9]{17})] (.+?) : (.*)");
+            _AllPatterns.Add("removeUser", "\\[([0-9.:-]+)][[ 0-9]+]LogNet: UChannel::Close: [A-z0-9_ ,.=:]+ RemoteAddr: ([0-9]+):[A-z0-9_ ,.=:]+ BP_PlayerController_(C_[0-9]+)");
+            _AllPatterns.Add("adminBroadcast", "\\[([0-9.:-]+)]\\[([ 0-9]*)]LogSquad: ADMIN COMMAND: Message broadcasted <(.+)> from (.+)");
+            _AllPatterns.Add("newGame", "\\[([0-9.:-]+)]\\[([ 0-9]*)]LogWorld: Bringing World \\/([A-z]+)\\/Maps\\/([A-z]+)\\/(?:Gameplay_Layers\\/)?([A-z0-9_]+)");
+            _AllPatterns.Add("playerDamaged", "\\[([0-9.:-]+)]\\[([ 0-9]*)]LogSquad: Player:(.+) ActualDamage=([0-9.]+) from (.+) caused by ([A-z_0-9]+)_C");
+            _AllPatterns.Add("playerDied", "\\[([0-9.:-]+)]\\[([ 0-9]*)]LogSquadTrace: \\[DedicatedServer](?:ASQSoldier::)?Die\\(\\): Player:(.+) KillingDamage=(?:-)*([0-9.]+) from ([A-z_0-9]+) caused by ([A-z_0-9]+)_C");
+            _AllPatterns.Add("playerPosses", "\\[([0-9.:-]+)]\\[([ 0-9]*)]LogSquadTrace: \\[DedicatedServer](?:ASQPlayerController::)?OnPossess\\(\\): PC=(.+) Pawn=([A-z0-9_]+)_C");
+            _AllPatterns.Add("playerUnPosses", "\\[([0-9.:-]+)]\\[([ 0-9]*)]LogSquadTrace: \\[DedicatedServer](?:ASQPlayerController::)?OnUnPossess\\(\\): PC=(.+)");
+            _AllPatterns.Add("playerRevived", "\\[([0-9.:-]+)]\\[([ 0-9]*)]LogSquad: (.+) has revived (.+)\\.");
+            _AllPatterns.Add("playerWounded", "\\[([0-9.:-]+)]\\[([ 0-9]*)]LogSquadTrace: \\[DedicatedServer](?:ASQSoldier::)?Wound\\(\\): Player:(.+) KillingDamage=(?:-)*([0-9.]+) from ([A-z_0-9]+) caused by ([A-z_0-9]+)_C");
+            _AllPatterns.Add("serverTick", "\\[([0-9.:-]+)]\\[([ 0-9]*)]LogSquad: USQGameState: Server Tick Rate: ([0-9.]+)");
+            _AllPatterns.Add("roundWinner", "\\[([0-9.:-]+)]\\[([ 0-9]*)]LogSquadTrace: \\[DedicatedServer]ASQGameMode::DetermineMatchWinner\\(\\): (.+) won on (.+)");
+            _AllPatterns.Add("playerList","/ID: ([0-9]+) \\| SteamID: ([0-9]{17}) \\| Name: (.+) \\| Team ID: ([0-9]+) \\| Squad ID: ([0-9]+|N\\/A)" );
+            _AllPatterns.Add("currentMap", "/^Current map is (.+), Next map is (.*)/");
+        }
 
-        public void matchList(string stringType, string line, string[] substring)
+        public void matchList(string stringType, string line, string[] substring, Boolean newUser = false)
         {
             switch (stringType)
             {
-                case "chatMessage":
-                    //Console.WriteLine("Test");
-                    Add(_ChatMessage, line, substring);
+                case "playerUnPosses":
+                    //Add Future Logic for seeing if someone is using admin cam to cheat. 
+                    if (adminInCameraDic.ContainsKey(substring[2]))
+                    {
+                        adminInCameraDic[substring[2]] = "Inactive";
+                    }
                     break;
-                case "adminBroadcast":
-                    //Console.WriteLine("Test");
-                    Add(_AdminBroadcast, line, substring);
+                case "UserJoining":
+                    if (!newUser)
+                    {
+                        C_ID = substring[2];
+                        //Adding the User C_ID to the Dictionary First, since we don't know the UserName yet. 
+                        setUserNameToC_ID.Add(substring[2], "not defined");
+                    }
+                    else if (newUser)
+                    {
+                        //Now that we have the User Name, we are combining that with the C_ID. 
+                        setUserNameToC_ID[C_ID] = substring[4];
+
+                        //Game Logs use SteamID to see who leaves. 
+                        //We are setting that as the Key, and it's value as the C_ID
+                        userSteamToC_ID.Add(substring[3], C_ID);
+
+
+                    }
                     break;
-                case "newGame":
-                    //Console.WriteLine("Test");
-                    Add(_NewGame, line, substring);
-                    break;
-                case "playerConnected":
-                    //Console.WriteLine("Test");
-                    Add(_PlayerConnected, line, substring);
-                    break;
-                case "playerDamaged":
-                    //Console.WriteLine("Test");
-                    Add(_PlayerWounded, line, substring);
-                    break;
-                case "playerDied":
-                    //Console.WriteLine("Test");
-                    Add(_PlayerKilled, line, substring);
+                case "removeUser":
+                    if (userSteamToC_ID.ContainsKey(substring[2]))
+                    {
+                        if (adminInCameraDic.ContainsKey(setUserNameToC_ID[userSteamToC_ID[substring[2]]]))
+                            adminInCameraDic[setUserNameToC_ID[userSteamToC_ID[substring[2]]]] = "Inactive";
+
+                        setUserNameToC_ID.Remove(userSteamToC_ID[substring[2]]);
+                        userSteamToC_ID.Remove(substring[2]);
+
+                    }
+                    else
+                    {
+                        //Console.WriteLine("This user: " + substring[2] + " Has decided to leave the server");
+                    }
                     break;
                 case "playerPosses":
-                    //Console.WriteLine("Test");
-                    Add(_PlayerPosses, line, substring);
+                    string bp_soldier = "bp_soldier";
+                    if (substring[3].ToLower().StartsWith(bp_soldier))
+                    {
+                        string[] teamID = substring[3].Split("_");
+                        if (userSetToTeam.ContainsKey(substring[2]))
+                        {
+                            userSetToTeam[substring[2]] = teamID[2];
+                        }
+                        else
+                        {
+                            userSetToTeam.Add(substring[2], teamID[2]);
+                        }
+
+                    }
+                    else if (substring[3].ToLower().StartsWith("cameraman"))
+                    {
+                        adminInCameraList.Add(line);
+                        if (adminInCameraDic.ContainsKey(substring[2]))
+                        {
+                            adminInCameraDic[substring[2]] = "Active";
+                        }
+                        else
+                        {
+                            adminInCameraDic.Add(substring[2], "Active");
+                        }
+                    }
                     break;
-                case "playerUnPosses":
-                    //Console.WriteLine("Test");
-                    Add(_PlayerUnPosses ,line, substring);
-                    break;
-                case "playerRevived":
-                    //Console.WriteLine("Test");
-                    Add(_PlayerRevived, line, substring);
-                    break;
-                case "playerWounded":
-                    //Console.WriteLine("Test");
-                    Add(_PlayerWounded, line, substring);
-                    break;
-                case "roundWinner":
-                    //Console.WriteLine("Test");
-                    Add(_RoundWinner, line, substring);
-                    break;
-                case "serverTick":
-                    //Console.WriteLine("Test");
-                    Add(_ServerTic, line, substring);
-                    break;
-                case "steamID":
-                    //Console.WriteLine("Test");
-                    Add(_SteamID, line, substring);
+                case "chatMessage":
                     break;
                 default:
-                    Console.WriteLine("Default was Called");
                     break;
             }
         }
-        
+
         private void Add(List<string> matchType, string line, string[] substring)
         {
             matchType.Add(line);

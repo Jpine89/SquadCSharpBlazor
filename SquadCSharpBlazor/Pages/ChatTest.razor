@@ -1,6 +1,7 @@
 ﻿@page "/ChatTest"
 @inject ChatModel ChatModel
 @inject AllPatterns AllPatterns
+@inject IModalService Modal
 @implements IDisposable
 <h3>chatTest</h3>
 
@@ -13,6 +14,16 @@
         }
     </ul>
 </div>
+<div class="card mb-4">
+    <div class="card-body">
+        <p class="card-text">
+            <code>
+                @("Modal.Show<Confirm>(\"Welcome to Blazored Modal\", options);")
+            </code>
+        </p>
+    </div>
+</div>
+<button @onclick="ShowModal" class="btn btn-primary">Show Modal</button>
 
 @functions {
     private System.Timers.Timer _timer;
@@ -23,9 +34,6 @@
         ChatModel.OnChange += StateHasChanged;
         int currentCount = 0;
         Console.WriteLine("Test");
-        //await InvokeAsync(
-        //ChatModel.StartReadFile
-        //);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -41,53 +49,9 @@
             };
             _timer.Enabled = true;
         }
-
-        //if (firstRender)
-        //{
-        //    _timer = new System.Timers.Timer(2000);
-
-        //    _timer.Elapsed += async (s, e) =>
-        //    {
-
-        //    //Console.WriteLine("Test");
-        //    //start at the end of the file
-
-        //    if (ChatModel.firstTime)
-        //        {
-        //            lastMaxOffset = ChatModel.reader.BaseStream.Length;
-        //            ChatModel.firstTime = false;
-        //        }
-
-        //    //if the file size has not changed, idle
-        //    if (ChatModel.reader.BaseStream.Length == lastMaxOffset)
-        //            Console.WriteLine("File Size currently: " + ChatModel.reader.BaseStream.Length, " , saved filed size: " + lastMaxOffset);
-        //        else
-        //        {
-        //        //seek to the last max offset
-        //        //ChatModel.reader.BaseStream.Seek(lastMaxOffset, SeekOrigin.Begin);
-
-        //        //read out of the file until the EOF
-        //        string line = "";
-        //        //line = reader.ReadLine();
-        //        while ((line = ChatModel.reader.ReadLine()) != null)
-        //            {
-        //                if (!string.IsNullOrWhiteSpace(line))
-        //                    ChatModel.Add(line);
-        //            }
-
-
-        //            await InvokeAsync(StateHasChanged);
-        //        //update the last max offset
-        //        lastMaxOffset = ChatModel.reader.BaseStream.Position;
-        //        }
-
-
-        //    };
-        //    _timer.Enabled = true;
-
-
-        //}
     }
+
+    void ShowModal() => Modal.Show<Confirm>("Welcome to Blazored Modal");
 
     public void Dispose()
     {
