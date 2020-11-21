@@ -2,11 +2,30 @@
 
 <h1>Counter</h1>
 
-<p>Current count: @currentCount</p>
+<p>
+    <input @bind="currentValue" /> Current value: @currentValue
+</p>
+
+<p>
+    <input @bind="CurrentValue" /> Current value: @CurrentValue
+</p>
+
+<input value="@CurrentValue"
+       @onchange="@((ChangeEventArgs __e) => CurrentValue =
+        __e.Value.ToString())" />
+
+<p>current value: @CurrentValue</p>
+
+
 
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
 
 @code {
+
+    private string currentValue;
+
+    private string CurrentValue { get; set; }
+
     private int currentCount = 0;
 
     private void IncrementCount()

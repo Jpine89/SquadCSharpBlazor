@@ -103,12 +103,9 @@ namespace SquadCSharpBlazor.Patterns
                     {
                         //Now that we have the User Name, we are combining that with the C_ID. 
                         setUserNameToC_ID[C_ID] = substring[4];
-
                         //Game Logs use SteamID to see who leaves. 
                         //We are setting that as the Key, and it's value as the C_ID
                         userSteamToC_ID.Add(substring[3], C_ID);
-
-
                     }
                     break;
                 case "removeUser":
@@ -119,7 +116,6 @@ namespace SquadCSharpBlazor.Patterns
 
                         setUserNameToC_ID.Remove(userSteamToC_ID[substring[2]]);
                         userSteamToC_ID.Remove(substring[2]);
-
                     }
                     else
                     {

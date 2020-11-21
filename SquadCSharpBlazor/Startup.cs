@@ -13,6 +13,7 @@ using Microsoft.Extensions.Hosting;
 using SquadCSharpBlazor.Data;
 using SquadCSharpBlazor.Patterns;
 using Blazored.Modal;
+using DataLibrary;
 
 namespace SquadCSharpBlazor
 {
@@ -36,6 +37,7 @@ namespace SquadCSharpBlazor
             services.AddSingleton<ChatModel>();
             services.AddSingleton<AllPatterns>();
             services.AddBlazoredModal();
+            services.AddSingleton<IDataAccess, DataAccess>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
