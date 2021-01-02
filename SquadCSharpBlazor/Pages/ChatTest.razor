@@ -1,5 +1,5 @@
 ﻿@page "/ChatTest"
-@inject ChatModel ChatModel
+@*@inject ChatModel ChatModel*@
 @inject AllPatterns AllPatterns
 @inject IModalService Modal
 @implements IDisposable
@@ -8,11 +8,14 @@
 
 <div class="container-fluid">
     <ul>
-        @foreach (var chat in AllPatterns._ChatMessage)
+        <li class="list-group-item text-left">
+            Something used to be here
+        </li>
+            @*@foreach (var chat in AllPatterns._ChatMessage)
         {
             <li class="list-group-item text-left">@chat</li>
-        }
-    </ul>
+        }*@
+</ul>
 </div>
 <div class="card mb-4">
     <div class="card-body">
@@ -24,6 +27,7 @@
     </div>
 </div>
 <button @onclick="ShowModal" class="btn btn-primary">Show Modal</button>
+<button @onclick="@(() => Modal.Show<FetchData>("Modal Example"))" class="btn btn-primary">Show Modal</button>
 
 @functions {
     private System.Timers.Timer _timer;
@@ -31,7 +35,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        ChatModel.OnChange += StateHasChanged;
+        //ChatModel.OnChange += StateHasChanged;
         int currentCount = 0;
         Console.WriteLine("Test");
     }
@@ -44,7 +48,7 @@
 
             _timer.Elapsed += async (s, e) =>
             {
-                await ChatModel.StartReadFile(AllPatterns);
+                //await ChatModel.StartReadFile(AllPatterns);
                 await InvokeAsync(StateHasChanged);
             };
             _timer.Enabled = true;
@@ -56,7 +60,7 @@
     public void Dispose()
     {
         _timer.Enabled = false;
-        ChatModel.OnChange -= StateHasChanged;
-        ChatModel.PageActive = false;
+        //ChatModel.OnChange -= StateHasChanged;
+        //ChatModel.PageActive = false;
     }
 }

@@ -34,7 +34,7 @@ namespace SquadCSharpBlazor
             services.AddServerSideBlazor();
             services.AddSingleton<WeatherForecastService>();
             services.AddScoped<PlayerListModel>();
-            services.AddSingleton<ChatModel>();
+            services.AddSingleton<ChatModelOLD>();
             services.AddSingleton<AllPatterns>();
             services.AddBlazoredModal();
             services.AddSingleton<IDataAccess, DataAccess>();

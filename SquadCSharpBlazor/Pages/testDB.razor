@@ -1,14 +1,104 @@
 ﻿@page "/testdb"
-@using DataLibrary
-@inject IDataAccess _data 
 
-<h3>testDB</h3>
+@using DataLibrary
+@inject IDataAccess _data
+@inject IConfiguration _config
+
+<h3>Testdb</h3>
+
+@if (chat == null)
+{
+    <p><em>Loading Data....</em></p>
+}
+else
+{
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col">
+                <ul class="overflow-auto" style="height: calc(100vh - 200px)">
+                    <li class="list-group-item active">Player List - @currentCount / 100</li>
+                    @foreach (var player in playerList)
+                    {
+
+                        if (player.connected == 1)
+                        { 
+                            <li class="list-group-item text-left">@player.userName</li>
+                        }
+                    }
+                </ul>
+            </div>
+            <div class="col">
+                <div class="container-fluid">
+                    <ul class="overflow-auto" style="height: calc(100vh - 200px)">
+                        <li class="list-group-item active">Chat Window</li>
+                        @foreach (var p in chat)
+                        {
+                            @if (p.chatType.Equals("TeamKill"))
+                            {
+                                <p class="alert-danger">
+                                    @p.chatType | @p.message
+                                </p>
+                            }
+                            else
+                            {
+                                <p>
+                                    @p.chatType | @p.message
+                                </p>
+                            }
+
+                        }
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
 
 @code {
+    List<ChatModel> chat;
+    List<PlayerList> playerList;
+    int currentCount = 0;
+
+    private System.Timers.Timer _timer;
 
     protected override async Task OnInitializedAsync()
     {
+        string _SQL = "SELECT * FROM (SELECT * FROM chatlog ORDER BY id desc limit 100) t ORDER BY id asc ";
+        chat = await _data.LoadData<ChatModel, dynamic>(_SQL, new { }, _config.GetConnectionString("SquadDataBase"));
+
+        _SQL = "SELECT * FROM playerlist where connected = 1";
+        playerList = await _data.LoadData<PlayerList, dynamic>(_SQL, new { }, _config.GetConnectionString("SquadDataBase"));
+        currentCount = playerList.Count();
         //await _data.LoadData
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _timer = new System.Timers.Timer(2000);
+
+            _timer.Elapsed += async (s, e) =>
+            {
+                //await ChatModel.StartReadFile(AllPatterns);
+                string _SQL = "SELECT * FROM (SELECT * FROM chatlog ORDER BY id desc limit 100) t ORDER BY id asc ";
+
+                chat = await _data.LoadData<ChatModel, dynamic>(_SQL, new { }, _config.GetConnectionString("SquadDataBase"));
+
+                _SQL = "SELECT * FROM playerlist where connected = 1";
+                playerList = await _data.LoadData<PlayerList, dynamic>(_SQL, new { }, _config.GetConnectionString("SquadDataBase"));
+                currentCount = playerList.Count();
+
+                await InvokeAsync(StateHasChanged);
+            };
+            _timer.Enabled = true;
+        }
+    }
+
+    private void IncrementCount()
+    {
+        currentCount++;
     }
 
 }

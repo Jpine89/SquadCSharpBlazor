@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SquadCSharpBlazor.Data
 {
-    public class ChatModel
+    public class ChatModelOLD
     {
 
         //private FileSystemWatcher _watcher;
@@ -23,7 +23,7 @@ namespace SquadCSharpBlazor.Data
         private int debugCounter;
         private Boolean userJoining;
         //public AllPatterns regexPattern;
-        public ChatModel()
+        public ChatModelOLD()
         {
             //_watcher = Watcher;
             //_Chat = new List<string>();
