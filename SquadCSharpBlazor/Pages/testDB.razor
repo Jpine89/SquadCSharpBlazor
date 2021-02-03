@@ -59,6 +59,7 @@ else
     List<ChatModel> chat;
     List<PlayerList> playerList;
     int currentCount = 0;
+    string playerName = "";
 
     private System.Timers.Timer _timer;
 
@@ -86,7 +87,7 @@ else
 
                 chat = await _data.LoadData<ChatModel, dynamic>(_SQL, new { }, _config.GetConnectionString("SquadDataBase"));
 
-                _SQL = "SELECT * FROM playerlist where connected = 1";
+                _SQL = "SELECT * FROM playerlist where connected = 1 ORDER BY username asc";
                 playerList = await _data.LoadData<PlayerList, dynamic>(_SQL, new { }, _config.GetConnectionString("SquadDataBase"));
                 currentCount = playerList.Count();
 

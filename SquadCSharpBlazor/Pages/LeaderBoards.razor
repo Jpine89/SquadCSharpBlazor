@@ -1,0 +1,65 @@
+﻿@page "/leaderboard"
+
+@using DataLibrary
+@inject IDataAccess _data
+@inject IConfiguration _config
+
+<h3>LeaderBoards</h3>
+
+<div class="container">
+
+</div>
+
+
+@code {
+    List<ChatModel> chat;
+    List<PlayerList> playerList;
+    List<LeaderBoards> LeaderBoard;
+    int currentCount = 0;
+    string playerName = "";
+
+    private System.Timers.Timer _timer;
+
+    protected override async Task OnInitializedAsync()
+    {
+        string _SQL = @"SELECT steam.steamID, user.userName, cast(((kills + wounded)/if(deaths = 0, 1, deaths)) as decimal(5,2)) AS KDA,
+                        steam.kills, steam.deaths, steam.wounded, steam.teamkills, steam.revives 
+                        from steamuser as steam
+                        LEFT JOIN usernamelist as user on user.steamID = steam.steamID
+                        order by kills desc";
+        chat = await _data.LoadData<ChatModel, dynamic>(_SQL, new { }, _config.GetConnectionString("SquadDataBase"));
+
+        _SQL = "SELECT * FROM playerlist where connected = 1";
+        playerList = await _data.LoadData<PlayerList, dynamic>(_SQL, new { }, _config.GetConnectionString("SquadDataBase"));
+        currentCount = playerList.Count();
+        //await _data.LoadData
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _timer = new System.Timers.Timer(2000);
+
+            _timer.Elapsed += async (s, e) =>
+            {
+                //await ChatModel.StartReadFile(AllPatterns);
+                string _SQL = "SELECT * FROM (SELECT * FROM chatlog ORDER BY id desc limit 100) t ORDER BY id asc ";
+
+                chat = await _data.LoadData<ChatModel, dynamic>(_SQL, new { }, _config.GetConnectionString("SquadDataBase"));
+
+                _SQL = "SELECT * FROM playerlist where connected = 1 ORDER BY username asc";
+                playerList = await _data.LoadData<PlayerList, dynamic>(_SQL, new { }, _config.GetConnectionString("SquadDataBase"));
+                currentCount = playerList.Count();
+
+                await InvokeAsync(StateHasChanged);
+            };
+            _timer.Enabled = true;
+        }
+    }
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
+}
